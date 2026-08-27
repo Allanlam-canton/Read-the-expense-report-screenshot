@@ -4,23 +4,6 @@
 # In[4]:
 
 
-import subprocess
-import sys
-
-# --- 🚀 终极自愈程序：绕过 Streamlit 依赖地狱 ---
-# 必须放在所有第三方库导入的最前面！
-try:
-    import cv2
-except ImportError:
-    # 如果发现底层系统缺少画图依赖导致 cv2 崩溃，自动触发热修复
-    print(">>> 拦截到系统依赖缺失，启动 OpenCV 自愈替换程序...")
-    subprocess.check_call([sys.executable, "-m", "pip", "uninstall", "-y", "opencv-python", "opencv-python-headless"])
-    subprocess.check_call([sys.executable, "-m", "pip", "install", "opencv-python-headless"])
-    if 'cv2' in sys.modules:
-        del sys.modules['cv2']
-    print(">>> 修复完成！继续执行...")
-
-# --- 以下为正常的业务代码 ---
 import streamlit as st
 from rapidocr_onnxruntime import RapidOCR
 from PIL import Image
@@ -31,7 +14,6 @@ import os
 import io
 from concurrent.futures import ThreadPoolExecutor
 
-# 设置页面配置
 st.set_page_config(page_title="极速报销单识别", page_icon="🧾", layout="centered")
 
 @st.cache_resource
@@ -78,9 +60,7 @@ def extract_amounts_from_image(uploaded_file):
                 "单号 (序号)": f"第 {i+1} 笔",
                 "消费金额 (USD)": float(amount)
             })
-
         return records
-
     except Exception as e:
         st.error(f"处理图片 {uploaded_file.name} 时出错：{e}")
         return []
@@ -119,7 +99,6 @@ def main():
     if st.session_state.is_processed:
         if st.session_state.results:
             st.success(f"极速提取完毕！成功提取咗 {len(st.session_state.results)} 笔费用！")
-
             output_mode = st.radio(
                 "导出方式", 
                 ["📝 文本框显示 (方便直接复制)", "⬇️ 下载 Excel 文件"], 
@@ -130,32 +109,25 @@ def main():
             if output_mode == "📝 文本框显示 (方便直接复制)":
                 text_lines = []
                 total_amount = 0.0
-
                 for item in st.session_state.results:
                     file_name = item['文件名 (来源)']
                     order_num = item['单号 (序号)']
                     amt = item['消费金额 (USD)']
                     total_amount += amt
                     text_lines.append(f"【{file_name}】 {order_num}： {amt:.2f} USD")
-
                 text_lines.append("-" * 35)
                 text_lines.append(f"💰 汇总总计 (Total): {total_amount:.2f} USD")
-
-                final_text = "\n".join(text_lines)
-                st.text_area("提取结果 (请点击框内 `Ctrl+A` 全选复制)：", value=final_text, height=300)
+                st.text_area("提取结果 (请点击框内 `Ctrl+A` 全选复制)：", value="\n".join(text_lines), height=300)
 
             elif output_mode == "⬇️ 下载 Excel 文件":
                 df = pd.DataFrame(st.session_state.results)
                 st.dataframe(df, use_container_width=True)
-
                 output = io.BytesIO()
                 with pd.ExcelWriter(output, engine='openpyxl') as writer:
                     df.to_excel(writer, index=False)
-                excel_data = output.getvalue()
-
                 st.download_button(
                     label="📥 立即下载 Excel",
-                    data=excel_data,
+                    data=output.getvalue(),
                     file_name="报销明细.xlsx",
                     mime="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                 )
