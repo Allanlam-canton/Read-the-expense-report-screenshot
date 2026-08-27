@@ -4,16 +4,14 @@
 # In[4]:
 
 
-import tkinter as tk
-from tkinter import filedialog, messagebox
+import streamlit as st
 from rapidocr_onnxruntime import RapidOCR
 from PIL import Image
 import numpy as np
 import pandas as pd
 import re
 import os
-import platform
-import subprocess
+import io
 from concurrent.futures import ThreadPoolExecutor
 
 # 隐藏主窗口并置顶弹窗
