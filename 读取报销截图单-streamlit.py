@@ -78,7 +78,7 @@ def extract_amounts_from_image(uploaded_file):
         full_text = full_text.replace('曰', '0')
 
         # 4. 极强容错正则
-        amount_pattern = r'(?:[总品5灬]\s*计|TOTAL|\b[Tt]ota[l1I](?:\s*[Ss]ale)?|TOT\s*AL|Visa|Master(?:card)?|Apple|Amex|付\s*款|汇\s*总|搭乘优步|REF\d+|INVOICE|[Aa]mount|R\s*m\s*o\s*u\s*n|nnount)[^\。\,\，\；]{0,80}?(?:US[\$S\s]*|U5[\$S\s]*|[\$S色]\s*|=\s*[\$S色]\s*)(\d+(?:\s*\d+)*\s*[\.\·\．\&\℃]\s*\d+(?:\s*\d+)*)'
+        amount_pattern = amount_pattern = r'(?:[总品5]\s*计|TOTAL|\b[Tt]ota[l1I](?:\s*[Ss]ale)?|Visa|Master(?:card)?|Apple|Amex|付\s*款|汇\s*总|搭乘优步)[^\。\,\，\；]{0,40}?(?:US[\$S\s]*|U5[\$S\s]*|[\$S]\s*|=\s*[\$S]\s*)(\d+\.\d{2})'
         amount_matches = re.findall(amount_pattern, full_text)
 
         # 5. 金额清洗与转换
