@@ -4,4 +4,3 @@ Pillow
 numpy
 pandas
 openpyxl
-opencv-python-headless
